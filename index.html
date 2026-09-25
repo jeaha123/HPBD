@@ -882,7 +882,7 @@ function onPlayerStateChange(event) {
   if (!bgMusic) return;
 
   if (event.data === YT.PlayerState.PLAYING) {
-    bgMusic.volume = 0.2; // Đang phát video -> Giảm nhạc nền xuống 20%
+    bgMusic.volume = 0.05; // Đang phát video -> Giảm nhạc nền xuống 20%
   } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
     bgMusic.volume = 1.0; // Dừng/Xem xong -> Tăng nhạc nền lên 100%
   }
