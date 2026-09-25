@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday My Love 💖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Dancing+Script:wght@700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #ffc3a0 0%, #ffafbd 50%, #ee9ca7 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 10px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Canvas Nền Động */
+    #bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Nút Bật/Tắt Nhạc */
+    .music-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #ff758c;
+      font-size: 1.4rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 117, 140, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: transform 0.2s ease;
+    }
+    .music-btn:hover { transform: scale(1.1); }
+    .music-btn.playing { animation: spin 3s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Nút Tự Động Cuộn */
+    .auto-scroll-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 22px;
+      border-radius: 30px;
+      background: linear-gradient(45deg, #ff758c, #ff7eb3);
+      color: #fff;
+      border: none;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+      z-index: 1000;
+      display: none;
+      animation: pulseGlow 2s infinite;
+    }
+
+    /* ANIMATIONS CHUYỂN MÀN MỚI SỐNG ĐỘNG */
+    .stage-enter {
+      animation: stageEnter 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .stage-exit {
+      animation: stageExit 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
+    }
+
+    @keyframes stageEnter {
+      0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(40px) rotate(-2deg);
+        filter: blur(10px);
+      }
+      70% {
+        transform: scale(1.03) translateY(-5px) rotate(0.5deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotate(0deg);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes stageExit {
+      0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.85) translateY(-40px);
+        filter: blur(10px);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4); transform: scale(1); }
+      50% { box-shadow: 0 8px 25px rgba(255, 117, 140, 0.7); transform: scale(1.04); }
+    }
+
+    /* Khung Card Chính */
+    .main-card {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.93);
+      padding: 35px 25px;
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(255, 117, 140, 0.25);
+      backdrop-filter: blur(10px);
+      max-width: 440px;
+      width: 100%;
+      transition: all 0.4s ease;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .gift-box {
+      font-size: 90px;
+      cursor: pointer;
+      display: inline-block;
+      margin: 15px 0;
+      animation: bounce 1.5s infinite alternate ease-in-out;
+      user-select: none;
+      filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+      transition: transform 0.3s;
+    }
+    .gift-box:hover { transform: scale(1.2) rotate(8deg); }
+
+    @keyframes bounce {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-18px) scale(1.05); }
+    }
+
+    h1 { color: #d63384; font-size: 1.5rem; margin-bottom: 8px; }
+    h2 { color: #ff477e; font-size: 1.2rem; margin-bottom: 12px; }
+    p { color: #6c757d; font-size: 0.95rem; line-height: 1.5; }
+
+    .btn-main {
+      margin-top: 15px;
+      padding: 12px 28px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #fff;
+      background: linear-gradient(45deg, #ff758c, #ff7eb3);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+      max-width: 280px;
+      animation: pulseGlow 2.5s infinite;
+    }
+    .btn-main:hover { transform: translateY(-3px) scale(1.02); }
+    .btn-main:active { transform: translateY(1px) scale(0.98); }
+
+    .btn-skip {
+      display: inline-block;
+      margin-top: 15px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px dashed #ff758c;
+      color: #d63384;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-skip:hover { background: #fff; transform: scale(1.05); }
+
+    /* Quiz Styling */
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+    .quiz-btn {
+      padding: 12px 16px; border: 2px solid #ffccd5; background: #fff;
+      color: #495057; border-radius: 12px; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; text-align: left; transition: all 0.25s ease;
+    }
+    .quiz-btn:hover { border-color: #ff758c; background: #fff5f7; transform: translateX(6px) scale(1.01); }
+
+    .progress-bar { width: 100%; height: 8px; background: #ffe6ea; border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
+    .progress-fill { height: 100%; width: 20%; background: linear-gradient(90deg, #ff758c, #ff7eb3); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* MÀN 3: TIMELINE CONTAINER WITH BETTER ENTRANCES */
+    .timeline-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px 0 60px 0;
+      display: none;
+    }
+
+    .timeline-header {
+      text-align: center;
+      margin-bottom: 40px;
+      background: rgba(255, 255, 255, 0.92);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(255, 117, 140, 0.2);
+    }
+
+    .timeline { position: relative; padding: 20px 0; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; left: 50%;
+      width: 4px; background: #ffb6c1;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    /* HIỆU ỨNG XUẤT HIỆN LẺ/CHẴN CHO KHUNG KỶ NIỆM */
+    .timeline-item {
+      position: relative;
+      margin-bottom: 45px;
+      opacity: 0;
+      transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .timeline-item:nth-child(odd) {
+      transform: translateY(60px) translateX(-25px) rotate(-3deg);
+    }
+    .timeline-item:nth-child(even) {
+      transform: translateY(60px) translateX(25px) rotate(3deg);
+    }
+    .timeline-item.visible {
+      opacity: 1;
+      transform: translateY(0) translateX(0) rotate(0deg);
+    }
+
+    .timeline-node {
+      position: absolute;
+      left: 50%; top: -18px;
+      transform: translateX(-50%);
+      width: 38px; height: 38px;
+      background: #ff477e; color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 0 0 5px #ffe6ea;
+      z-index: 5;
+      transition: transform 0.3s;
+    }
+    .timeline-item.visible .timeline-node {
+      animation: popNode 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes popNode {
+      0% { transform: translateX(-50%) scale(0); }
+      70% { transform: translateX(-50%) scale(1.3); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+
+    .card-base {
+      width: 88%;
+      margin: 0 auto;
+      text-align: center;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+    }
+    .card-base:hover { transform: scale(1.04) translateY(-3px); }
+
+    .card-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 8px; }
+    .card-quote { font-family: 'Dancing Script', cursive; font-size: 1.35rem; line-height: 1.5; }
+
+    /* 10 PHONG CÁCH KHUNG KỶ NIỆM */
+    .style-polaroid {
+      background: #fff; padding: 25px 20px; border-radius: 4px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1); transform: rotate(-3deg);
+      position: relative; border-bottom: 12px solid #f4f4f4;
+    }
+    .style-polaroid::before {
+      content: ''; position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(2deg);
+      width: 80px; height: 24px; background: rgba(255, 182, 193, 0.8);
+    }
+
+    .style-chat {
+      background: linear-gradient(135deg, #ffffff, #fff0f5); padding: 20px;
+      border-radius: 20px 20px 4px 20px; border: 2px solid #ff758c;
+      box-shadow: 0 8px 20px rgba(255,117,140,0.15); text-align: left;
+    }
+
+    .style-ticket {
+      background: #fff9e6; padding: 22px 18px; border-radius: 14px;
+      border: 2px dashed #ff758c; position: relative; transform: rotate(2deg);
+    }
+    .style-ticket::before, .style-ticket::after {
+      content: ''; position: absolute; top: 50%; width: 20px; height: 20px;
+      background: #ffafbd; border-radius: 50%; transform: translateY(-50%);
+    }
+    .style-ticket::before { left: -12px; } .style-ticket::after { right: -12px; }
+
+    .style-glass {
+      background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px);
+      padding: 22px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.9);
+      box-shadow: 0 10px 30px rgba(255, 71, 126, 0.2);
+    }
+
+    .style-neon {
+      background: #2b1055; color: #fff; padding: 22px; border-radius: 18px;
+      border: 2px solid #ff758c; box-shadow: 0 0 15px #ff758c, inset 0 0 10px #ff758c;
+    }
+
+    .style-notebook {
+      background-color: #fff;
+      background-image: linear-gradient(#e5e5e5 1px, transparent 1px), linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
+      background-size: 16px 16px; padding: 22px; border-radius: 12px;
+      border-left: 6px solid #ff477e; box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    .style-postcard {
+      background: #fff8f0; padding: 22px; border-radius: 8px;
+      border: 2px solid #d4a373; position: relative; transform: rotate(-2deg);
+    }
+    .style-postcard::after {
+      content: 'Stamp'; position: absolute; top: 12px; right: 12px;
+      font-size: 0.65rem; padding: 4px 6px; border: 2px dashed #d4a373; color: #b08968;
+    }
+
+    .style-insta {
+      background: #fff; padding: 18px; border-radius: 16px;
+      border: 1px solid #eee; box-shadow: 0 8px 24px rgba(0,0,0,0.06); text-align: left;
+    }
+    .style-insta-header { font-weight: 800; font-size: 0.85rem; color: #333; margin-bottom: 8px; }
+
+    .style-ribbon {
+      background: #fff0f3; padding: 24px 20px; border-radius: 16px;
+      border: 2px solid #ff477e; position: relative; overflow: hidden;
+    }
+    .style-ribbon::before {
+      content: 'SPECIAL'; position: absolute; top: 12px; right: -25px;
+      background: #ff477e; color: #fff; font-size: 0.65rem; font-weight: 800;
+      padding: 3px 25px; transform: rotate(45deg);
+    }
+
+    .style-cloud {
+      background: #ffffff; padding: 24px; border-radius: 35px;
+      box-shadow: 0 12px 30px rgba(173, 216, 230, 0.4);
+      border: 3px solid #e0f2fe;
+    }
+
+    /* MÀN 4: VIDEO LỜI CHÚC TRANG TRÍ RIÊNG BIỆT */
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      background: #000;
+      margin: 20px 0;
+      border: 4px solid #fff;
+    }
+
+    .video-wrapper video {
+      width: 100%;
+      display: block;
+      max-height: 480px;
+      border-radius: 12px;
+    }
+
+    .video-caption {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.4rem;
+      color: #d63384;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Canvas Animation -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Nút Tắt/Bật Nhạc -->
+  <button id="musicToggleBtn" class="music-btn" onclick="toggleMusic()" title="Tắt/Bật nhạc">🎵</button>
+
+  <!-- Nút Tự Động Cuộn Màn 3 -->
+  <button id="autoScrollBtn" class="auto-scroll-btn" onclick="toggleAutoScroll()">▶️ Tự động cuộn</button>
+
+  <!-- MÀN 1 & MÀN 2 CONTAINER -->
+  <div class="main-card stage-enter" id="mainCard">
+
+    <!-- Màn 1: Hộp Quà Bí Ẩn -->
+    <div id="stage1">
+      <h1>Có một món quà nhỏ... 🎁</h1>
+      <p>Bấm vào hộp quà để khám phá bí mật nhé!</p>
+      <div class="gift-box" onclick="openGift()">🎁</div>
+      <br>
+      <button class="btn-main" onclick="openGift()">Mở Ra Xem Nào ✨</button>
+      <br>
+      <button class="btn-skip" onclick="skipStage1()">Bỏ qua phần này ⏩</button>
+    </div>
+
+    <!-- Màn 2: Mini-game Quiz -->
+    <div id="stage2" style="display: none;">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #888; margin-bottom: 10px;">
+        <span id="questionStep">Câu 1/5</span>
+        <span id="scoreText">❤️ 0/5</span>
+      </div>
+      <h2 id="quizQuestion">Câu hỏi ở đây?</h2>
+      <div class="quiz-options" id="quizOptions"></div>
+      <p id="feedbackText" style="min-height: 24px; font-weight: bold; color: #d63384;"></p>
+      <button class="btn-skip" onclick="skipStage2()">Bỏ qua thử thách ⏩</button>
+    </div>
+
+  </div>
+
+  <!-- MÀN 3: HÀNH TRÌNH TÌNH YÊU VỚI 10 KHUNG KỶ NIỆM -->
+  <div class="timeline-container" id="stage3">
+    <div class="timeline-header">
+      <h1>Hành Trình Tình Yêu 💖</h1>
+      <p>Cuộn xuống để đọc từng lời nhắn anh gửi tới em nhé!</p>
+    </div>
+
+    <div class="timeline">
+      
+      <!-- 1. POLAROID -->
+      <div class="timeline-item">
+        <div class="timeline-node">☕</div>
+        <div class="card-base style-polaroid">
+          <div class="card-title" style="color:#d63384;">1. Lần Đầu Gặp Nhau</div>
+          <p class="card-quote" style="color:#333;">"Khoảnh khắc ta tiếp xúc với nhau, anh biết cuộc sống mình từ đây đã thay đổi..."</p>
+        </div>
+      </div>
+
+      <!-- 2. BONG BÓNG TIN NHẮN -->
+      <div class="timeline-item">
+        <div class="timeline-node">🛵</div>
+        <div class="card-base style-chat">
+          <div class="card-title" style="color:#ff477e;">2. Những Lần Trò Chuyện Với Nhau </div>
+          <p class="card-quote" style="font-family:'Caveat', cursive; font-size:1.5rem; color:#444;">"Cùng em tâm sự, kể về cuộc sống hàng ngày."</p>
+        </div>
+      </div>
+
+      <!-- 3. VÉ TÌNH YÊU -->
+      <div class="timeline-item">
+        <div class="timeline-node">🎫</div>
+        <div class="card-base style-ticket">
+          <div class="card-title" style="color:#e65100;">3. Buồn Vui Có Nhau</div>
+          <p class="card-quote" style="color:#5d4037;">"Ấm áp và bình yên - đó là cảm giác duy nhất anh có em bên cạnh."</p>
+        </div>
+      </div>
+
+      <!-- 4. THỦY TINH -->
+      <div class="timeline-item">
+        <div class="timeline-node">✨</div>
+        <div class="card-base style-glass">
+          <div class="card-title" style="color:#c2185b;">4. Mỗi Ngày Bên Em</div>
+          <p class="card-quote" style="color:#2c3e50;">"Cảm ơn em đã mang đến thật nhiều tiếng cười và tô điểm màu sắc cho thế giới của anh."</p>
+        </div>
+      </div>
+
+      <!-- 5. NEON -->
+      <div class="timeline-item">
+        <div class="timeline-node">🌙</div>
+        <div class="card-base style-neon">
+          <div class="card-title" style="color: #ff8fa3;">5. Những Đêm Chơi Game Cùng Nhau</div>
+          <p class="card-quote" style="color: #fff;">"Khoảng thời gian cùng chơi, cùng xem thật sự rất rất vui."</p>
+        </div>
+      </div>
+
+      <!-- 6. SỔ TAY KẺ CARO -->
+      <div class="timeline-item">
+        <div class="timeline-node">✏️</div>
+        <div class="card-base style-notebook">
+          <div class="card-title" style="color:#ff477e; text-align:left;">6. Những Lần Giận Hờn, Cãi Vã</div>
+          <p class="card-quote" style="color:#333; text-align:left;">"Anh thật may mắn vì sau mỗi lần như vậy chúng ta điều ở lại và nói chuyện với nhau."</p>
+        </div>
+      </div>
+
+      <!-- 7. BƯU THIẾP CỔ ĐIỂN -->
+      <div class="timeline-item">
+        <div class="timeline-node">📮</div>
+        <div class="card-base style-postcard">
+          <div class="card-title" style="color:#b08968;">7. Bưu Thiếp Gửi Tương Lai</div>
+          <p class="card-quote" style="color:#6c584c;">"Dù 5 năm hay 50 năm nữa, anh sẽ không bao giờ quên những kí ức, kỉ niệm cùng có với em."</p>
+        </div>
+      </div>
+
+      <!-- 8. INSTAGRAM POST -->
+      <div class="timeline-item">
+        <div class="timeline-node">📸</div>
+        <div class="card-base style-insta">
+          <div class="style-insta-header">❤️ my_love_story • Following</div>
+          <div class="card-title" style="color:#d63384;">8. Khoảnh Khắc Ngốc Nghếch</div>
+          <p class="card-quote" style="color:#444; font-size:1.2rem;">"Thích nhất là những lúc hai đứa trêu ghẹo nhau rồi cùng nhau mỉm cười."</p>
+        </div>
+      </div>
+
+      <!-- 9. RUY BĂNG QUÀ TẶNG -->
+      <div class="timeline-item">
+        <div class="timeline-node">🎀</div>
+        <div class="card-base style-ribbon">
+          <div class="card-title" style="color:#ff477e;">9. Món Quà Tuyệt Vời Nhất</div>
+          <p class="card-quote" style="color:#555;">"Ông trời đã ban tặng cho anh một món quà vô giá, đó chính là sự xuất hiện của em."</p>
+        </div>
+      </div>
+
+      <!-- 10. ĐÁM MÂY MỀM MẠI -->
+      <div class="timeline-item">
+        <div class="timeline-node">☁️</div>
+        <div class="card-base style-cloud">
+          <div class="card-title" style="color:#0284c7;">10. Giấc Mơ Bình Yên</div>
+          <p class="card-quote" style="color:#334155;">"Bên em, mọi giông bão ngoài kia đều dừng sau cánh cửa. Chúc mừng sinh nhật em nhé!"</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- NÚT CHUYỂN SANG MÀN VIDEO -->
+    <div style="text-align: center; margin-top: 30px;">
+      <button class="btn-main" style="max-width: 320px; font-size: 1.1rem; padding: 15px 30px;" onclick="goToStage4()">Tiếp tục nè ✨ 💕</button>
+    </div>
+  </div>
+
+  <!-- MÀN 4: THƯỚC PHIM LỜI CHÚC -->
+  <div class="main-card" id="stage4" style="display: none; max-width: 500px;">
+    <h1>🎬 Thước Phim Dành Tặng Em 💕</h1>
+    <p class="video-caption">Bấm play để lắng nghe lời chúc trực tiếp từ anh nhé!</p>
+    
+    <div class="video-wrapper">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/85JEEohJHT0?si=JvVsV3s0DD0o3kcx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>    </div>
+
+    <p style="color: #555; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.6;">
+      Chúc mừng sinh nhật Vân nhé! Cảm ơn em đã luôn đồng hành và mang đến thật nhiều niềm vui cho anh 💖
+    </p>
+
+    <button class="btn-main" onclick="finalReward()">Bấm Vào Đây Để Kết Thúc 🎁</button>
+  </div>
+
+  <audio id="bgMusic" loop preload="auto">
+    <source src="music/Winter Sonata.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // Canvas animation background
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouseTrail = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class FloatingParticle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 100;
+        this.size = Math.random() * 14 + 8;
+        this.speedY = Math.random() * 1.5 + 0.5;
+        this.speedX = Math.sin(Math.random() * Math.PI) * 0.8;
+        this.opacity = Math.random() * 0.5 + 0.3;
+        this.symbol = ['💖', '✨', '🌸', '🎈', '⭐'][Math.floor(Math.random() * 5)];
+      }
+      update() {
+        this.y -= this.speedY;
+        this.x += Math.sin(this.y * 0.01) * 0.5;
+        if (this.y < -30) this.reset();
+      }
+      draw() {
+        ctx.globalAlpha = this.opacity;
+        ctx.font = `${this.size}px sans-serif`;
+        ctx.fillText(this.symbol, this.x, this.y);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    for (let i = 0; i < 35; i++) {
+      particles.push(new FloatingParticle());
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      mouseTrail.push({
+        x: e.clientX,
+        y: e.clientY,
+        size: Math.random() * 12 + 8,
+        opacity: 1,
+        symbol: Math.random() > 0.5 ? '💗' : '✨'
+      });
+    });
+
+    function animateCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+
+      for (let i = 0; i < mouseTrail.length; i++) {
+        let t = mouseTrail[i];
+        ctx.globalAlpha = t.opacity;
+        ctx.font = `${t.size}px sans-serif`;
+        ctx.fillText(t.symbol, t.x - t.size / 2, t.y - t.size / 2);
+        t.opacity -= 0.025;
+        t.y -= 0.5;
+        if (t.opacity <= 0) {
+          mouseTrail.splice(i, 1);
+          i--;
+        }
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(animateCanvas);
+    }
+    animateCanvas();
+
+    // Controls & Quiz Logic
+    const music = document.getElementById('bgMusic');
+    const musicBtn = document.getElementById('musicToggleBtn');
+    const birthdayVideo = document.getElementById('birthdayVideo');
+    let isPlaying = false;
+
+  if (birthdayVideo) {
+  // Khi bấm Play Video: Giảm âm lượng nhạc nền xuống còn 20% (0.2)
+  birthdayVideo.addEventListener('play', () => {
+    music.volume = 0.2;
+  });
+
+  // Khi bấm Tạm dừng (Pause) Video: Tăng lại âm lượng nhạc nền lên 100% (1.0)
+  birthdayVideo.addEventListener('pause', () => {
+    music.volume = 1.0;
+  });
+
+  // Khi xem xong Video: Tăng lại âm lượng nhạc nền lên 100% (1.0)
+  birthdayVideo.addEventListener('ended', () => {
+    music.volume = 1.0;
+  });
+}
+
+    function toggleMusic() {
+      if (isPlaying) {
+        music.pause();
+        musicBtn.innerHTML = '🔇';
+        musicBtn.classList.remove('playing');
+        isPlaying = false;
+      } else {
+        music.play().then(() => {
+          musicBtn.innerHTML = '🎵';
+          musicBtn.classList.add('playing');
+          isPlaying = true;
+        }).catch(e => console.log(e));
+      }
+    }
+
+    function ensureMusic() { if (!isPlaying) toggleMusic(); }
+    function triggerConfetti() { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); }
+
+    // HÀM CHUYỂN MÀN CHUYÊN NGHIỆP CÓ HIỆU ỨNG THOÁT & VÀO
+    function animateStageSwitch(fromEl, toEl, callback) {
+      fromEl.classList.remove('stage-enter');
+      fromEl.classList.add('stage-exit');
+
+      setTimeout(() => {
+        fromEl.style.display = 'none';
+        fromEl.classList.remove('stage-exit');
+
+        toEl.style.display = 'block';
+        toEl.classList.add('stage-enter');
+
+        if (callback) callback();
+      }, 380);
+    }
+
+    function openGift() {
+      ensureMusic();
+      triggerConfetti();
+      animateStageSwitch(document.getElementById('stage1'), document.getElementById('stage2'), initQuiz);
+    }
+
+    function skipStage1() {
+      ensureMusic();
+      animateStageSwitch(document.getElementById('stage1'), document.getElementById('stage2'), initQuiz);
+    }
+
+    const questions = [
+      {
+        question: "1. Lần đầu chúng ta tiếp xúc nhau là khi nào nè?",
+        options: ["A. 25/12", "B. 26/12", "C. 27/12", "D. 28/12"],
+        correct: 0,
+        wrongMsg: "Hừm, chưa chính xác nha! Đoán lại xem nào 😜"
+      },
+      {
+        question: "2. Món bánh mà em thích là gì nè?",
+        options: ["A. Bánh bông lan bơ 🍰", "B. Bánh tráng 🥙", "C. Bánh trung thu 🥮", "D. Tất cả các món trên 😋"],
+        correct: 3,
+        wrongMsg: "Ủa sai rồi nha, suy nghĩ kỹ lại xem nào! 😝"
+      },
+      {
+        question: "3. Ai là người chủ động nhắn tin trước?",
+        options: ["A. Anh chứ ai 😎", "B. Em nè 🙈", "C. Cả hai cùng lúc ⚡", "D. Định mệnh sắp đặt ✨"],
+        correct: 0,
+        wrongMsg: "Sai rồi nhen, nhớ lại coi nào! 😛"
+      },
+      {
+        question: "4. Mỗi khi anh làm em giận, cách dỗ hiệu quả nhất là gì?",
+        options: ["A. Để em một mình", "B. Lắng nghe điều em muốn", "C. Tôn trọng lời nói của em", "D. Cả A, B và C đều đúng 🥰"],
+        correct: 3,
+        wrongMsg: "Chưa đúng đâu nha, chọn đáp án chuẩn nhất đi! 💖"
+      },
+      {
+        question: "5. Sinh nhật năm nay, anh chúc em điều gì nhất?",
+        options: ["A. Luôn xinh đẹp và Hạnh phúc", "B. Mọi chuyện điều thành công và thuận lợi", "C. Mọi ước mơ đều thành hiện thực", "D. Luôn khỏe mạnh và sống thoải mái"],
+        correct: 2,
+        wrongMsg: "Đáp án C mới là chân lý nè! 😉"
+      }
+    ];
+
+    let currentQ = 0, score = 0;
+
+    function initQuiz() { currentQ = 0; score = 0; showQuestion(); }
+
+    function showQuestion() {
+      const q = questions[currentQ];
+      document.getElementById('questionStep').innerText = `Câu ${currentQ + 1}/${questions.length}`;
+      document.getElementById('scoreText').innerText = `❤️ ${score}/${questions.length}`;
+      document.getElementById('progressFill').style.width = `${((currentQ + 1) / questions.length) * 100}%`;
+      document.getElementById('quizQuestion').innerText = q.question;
+      document.getElementById('feedbackText').innerText = "";
+
+      const optionsDiv = document.getElementById('quizOptions');
+      optionsDiv.innerHTML = "";
+
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(index, btn);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+      const q = questions[currentQ];
+      if (selectedIndex === q.correct) {
+        btnElement.style.background = "#d4edda";
+        btnElement.style.borderColor = "#28a745";
+        document.getElementById('feedbackText').innerText = "Chính xác luôn! 🎉";
+        score++;
+        triggerConfetti();
+
+        setTimeout(() => {
+          currentQ++;
+          if (currentQ < questions.length) showQuestion();
+          else finishQuiz();
+        }, 800);
+      } else {
+        document.getElementById('feedbackText').innerText = q.wrongMsg;
+      }
+    }
+
+    function skipStage2() { finishQuiz(); }
+
+    function finishQuiz() {
+      animateStageSwitch(
+        document.getElementById('mainCard'), 
+        document.getElementById('stage3'), 
+        () => {
+          document.getElementById('autoScrollBtn').style.display = 'block';
+          initScrollObserver();
+          triggerConfetti();
+        }
+      );
+    }
+
+    function initScrollObserver() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.timeline-item').forEach(item => observer.observe(item));
+    }
+
+    let isAutoScrolling = false;
+    let autoScrollInterval;
+
+    function toggleAutoScroll() {
+      const btn = document.getElementById('autoScrollBtn');
+      if (!isAutoScrolling) {
+        isAutoScrolling = true;
+        btn.innerText = '⏸️ Tạm dừng cuộn';
+        autoScrollInterval = setInterval(() => {
+          window.scrollBy({ top: 2, behavior: 'smooth' });
+          if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+            toggleAutoScroll();
+          }
+        }, 20);
+      } else {
+        isAutoScrolling = false;
+        btn.innerText = '▶️ Tự động cuộn';
+        clearInterval(autoScrollInterval);
+      }
+    }
+
+    // CHUYỂN TỪ MÀN 3 SANG MÀN 4 (VIDEO) VỚI ANIMATION
+    function goToStage4() {
+      if (isAutoScrolling) toggleAutoScroll();
+      
+      const stage3 = document.getElementById('stage3');
+      const stage4 = document.getElementById('stage4');
+      
+      document.getElementById('autoScrollBtn').style.display = 'none';
+      
+      stage3.classList.add('stage-exit');
+      setTimeout(() => {
+        stage3.style.display = 'none';
+        stage3.classList.remove('stage-exit');
+        
+        stage4.style.display = 'block';
+        stage4.classList.add('stage-enter');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        triggerConfetti();
+      }, 380);
+    }
+
+    function finalReward() {
+      const end = Date.now() + (3 * 1000);
+      const colors = ['#ff758c', '#ff7eb3', '#ffffff', '#ff477e'];
+
+      (function frame() {
+        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      }());
+
+      alert("🎁 Chúc em tuổi mới luôn vui vẻ, thoải mái, mọi chuyện đều thuận lợi, sức khỏe lúc nào cũng tràn trề, chúc em tất cả trừ vất vả và mọi chuyện xấu, phải thật hạnh phúc nhé người a từng thương rất nhiều!");
+    }
+  </script>
+</body>
+</html>
