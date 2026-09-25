@@ -537,29 +537,38 @@
       <button class="btn-main" style="max-width: 320px; font-size: 1.1rem; padding: 15px 30px;" onclick="goToStage4()">Tiếp tục nè ✨ 💕</button>
     </div>
   </div>
+<!-- MÀN 4: THƯỚC PHIM LỜI CHÚC -->
+<div class="main-card" id="stage4" style="display: none; max-width: 500px;">
+  <h1>🎬 Thước Phim Dành Tặng Em 💖</h1>
+  <p class="video-caption">Bấm play để lắng nghe lời chúc trực tiếp từ anh nhé!</p>
 
-  <!-- MÀN 4: THƯỚC PHIM LỜI CHÚC -->
-  <div class="main-card" id="stage4" style="display: none; max-width: 500px;">
-    <h1>🎬 Thước Phim Dành Tặng Em 💕</h1>
-    <p class="video-caption">Bấm play để lắng nghe lời chúc trực tiếp từ anh nhé!</p>
-    
-<div class="video-wrapper" style="width: 100%; max-width: 280px; margin: 15px auto; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(214, 51, 132, 0.25); border: 3px solid #fff;">
-  <iframe 
-    src="https://www.youtube.com/embed/85JFFohIHT0?rel=0&modestbranding=1" 
-    title="YouTube video player" 
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-    allowfullscreen 
-    style="width: 100%; aspect-ratio: 9/16; border: none; display: block;">
-  </iframe>
+  <!-- Khung Video YouTube 16:9 -->
+  <div class="video-wrapper" style="width: 100%; margin: 15px auto; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 20px rgba(214, 51, 132, 0.2); border: 2px solid #fff;">
+    <iframe 
+      src="https://www.youtube.com/embed/85JEEohJHT0?si=sXvXI4qaFgnIDPRk&rel=0&modestbranding=1" 
+      title="YouTube video player" 
+      frameborder="0" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen 
+      style="width: 100%; aspect-ratio: 16/9; border: none; display: block;">
+    </iframe>
+  </div>
+
+  <!-- Đoạn Lời Chúc -->
+  <p style="color: #555; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.6;">
+    Chúc mừng sinh nhật Vân nhé! Cảm ơn em đã luôn đồng hành và mang đến thật nhiều niềm vui cho anh 💖
+  </p>
+
+  <!-- Nút Bấm Kết Thúc -->
+<button class="btn-main" onclick="finalReward()">Bấm Vào Đây Để Kết Thúc 🎁</button>
 </div>
-  <audio id="bgMusic" loop preload="auto">
-    <source src="music/Winter Sonata.mp3" type="audio/mpeg">
-  </audio>
 
-  <script>
-    // Canvas animation background
-    const canvas = document.getElementById('bgCanvas');
+<audio id="bgMusic" loop preload="auto">
+  <source src="music/Winter Sonata.mp3" type="audio/mpeg">
+</audio>
+
+<script>    const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
     let mouseTrail = [];
