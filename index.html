@@ -544,15 +544,16 @@
 
   <!-- Khung Video YouTube 16:9 -->
   <div class="video-wrapper" style="width: 100%; margin: 15px auto; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 20px rgba(214, 51, 132, 0.2); border: 2px solid #fff;">
-    <iframe 
-      src="https://www.youtube.com/embed/85JEEohJHT0?si=sXvXI4qaFgnIDPRk&rel=0&modestbranding=1" 
-      title="YouTube video player" 
-      frameborder="0" 
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen 
-      style="width: 100%; aspect-ratio: 16/9; border: none; display: block;">
-    </iframe>
+<iframe 
+  id="ytVideo"
+  src="https://www.youtube.com/embed/85JEEohJHT0?enablejsapi=1&rel=0&modestbranding=1" 
+  title="YouTube video player" 
+  frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen 
+  style="width: 100%; aspect-ratio: 16/9; border: none; display: block;">
+</iframe>
   </div>
 
   <!-- Đoạn Lời Chúc -->
@@ -861,6 +862,31 @@
 
       alert("🎁 Chúc em tuổi mới luôn vui vẻ, thoải mái, mọi chuyện đều thuận lợi, sức khỏe lúc nào cũng tràn trề, chúc em tất cả trừ vất vả và mọi chuyện xấu, phải thật hạnh phúc nhé người a từng thương rất nhiều!");
     }
+    // Tự động giảm âm lượng nhạc nền khi xem Video YouTube
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+var player;
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('ytVideo', {
+    events: {
+      'onStateChange': onPlayerStateChange
+    }
+  });
+}
+
+function onPlayerStateChange(event) {
+  var bgMusic = document.getElementById('bgMusic');
+  if (!bgMusic) return;
+
+  if (event.data === YT.PlayerState.PLAYING) {
+    bgMusic.volume = 0.2; // Đang phát video -> Giảm nhạc nền xuống 20%
+  } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+    bgMusic.volume = 1.0; // Dừng/Xem xong -> Tăng nhạc nền lên 100%
+  }
+}
   </script>
 </body>
 </html>
